@@ -1,0 +1,16 @@
+language: node_js
+node_js: node
+install:
+- npm install
+script:
+- npm run travis
+deploy:
+  provider: npm
+  email: zouxuoz@gmail.com
+  skip_cleanup: true
+  api_key:
+    secure: "louZp6Bfc9hAUhpQ5/0LIIGzi8hrKivVEJWcmkN0iAELPFto8PRRiNp2OjIbtckgR5ytZuEcA3VYkEhvs/ICRYuNc0FQunVx6n850MORNLLhuj0qkgE03pdsm932YFH2rvD6BB+foDYlDZlYtanYOdcED1RkTUYwtG9NISa4GvPVByzlO4PPV/4n6WBDPsYyNXYDutEeXZ3x386rc7R3UBzCEkG+k7KwmtgiD2Ulz5mW2xABBnEUGmIQm3MX6nHI5V/3jLEpCizs3akfHOlENQ9Tp8xF8i8D9Ji21aHfDdfp/eGaxwnzh88Sx1hvEnNFXNyEI7QDw92cqg0SdGc2lV6t8gAx6fUlMhCGfeIRt3TmuQZONBDi6B3tTg6iFWYkuH23g1ukY7gfK5MuzerzQ0jCyzuHoiXH40c8baj3O7vDygT5Nip9XCq2m+SGNaWY/sFnMkxT5pEKMNAFGz9SyTP5rP3FNLbZ8VOGPRxhdxFcB9JhfFsRdCpyAJ2eb0nnMD+rpMOuZmSafcU6+QjbyUTEhc+80NNTweQLxdPVQ3Tge+/b/0IlQS3QsnjQ6wq5WuucuhS10AL3kGa5AHN38Dmbecv/ultOzcgeJclPiWR0HierZ6OiQHnbsHAff8i5ZlLCedo58rG+vlKFKRxiYr126smf9P4Fe3G9VyOeU50="
+  on:
+    tags: true
+    repo: 8base/dev-api-cli
+    branch: master
