@@ -48,7 +48,14 @@ $ node_modules/.bin/8base-api-cli
 ```
 
 ## Usage
+Before usage you should set API endpoint
+
 ```
+  8base-api-cli config:set --name=url --value=https://api.8base.com
+```
+
+```
+
 Usage: 8base-api-cli <command> [options]
 
 Commands:
