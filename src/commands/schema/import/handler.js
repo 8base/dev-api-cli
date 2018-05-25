@@ -4,21 +4,18 @@ const pkg = require('../../../../package.json');
 const logger = require('../../../logger');
 
 module.exports = async (argv, ctx) => {
-  // console.log(argv);
   const schema = JSON.parse(fs.readFileSync(argv.file, 'utf8'));
   if (pkg.version !== schema.version) {
     logger.warn(`Schema in file '${argv.file}' have different version!`);
     return;
   }
 
-  // console.log("%o", schema);
   const systemTables = (await ctx.client.getTables(false)).reduce((result, table) => {
     if (table.isSystem) {
-      result[table.name] = table.id;
+      result[table.name] = table.id; // eslint-disable-line no-param-reassign
     }
     return result;
   }, {});
-  // console.log("systemTables %o", systemTables);
 
   const importedTables = new Map();
 
@@ -27,30 +24,26 @@ module.exports = async (argv, ctx) => {
 
     if (schemaTable.isSystem) {
       table = {
-        id: systemTables[schemaTable.name]
+        id: systemTables[schemaTable.name],
       };
     } else {
       table = await ctx.client.createTable({
         name: schemaTable.name,
         displayName: schemaTable.displayName,
-      })
+      });
     }
 
     importedTables.set(schemaTable.name, table);
   }
-  // console.log("importedTables %o", importedTables);
 
   for (const schemaTable of schema.tables) {
     if (schemaTable.isSystem) {
       continue;
     }
 
-    // console.log(schemaTable);
     const table = importedTables.get(schemaTable.name);
-    // console.log(table);
 
     for (const schemaField of schemaTable.fields) {
-      // console.log(schemaField);
       const field = pick(schemaField, [
         'name',
         'displayName',
@@ -84,7 +77,6 @@ module.exports = async (argv, ctx) => {
 
         if (refTable.relations && refTable.relations[schemaTable.name]) {
           if (refTable.relations[schemaTable.name].includes(schemaField.name)) {
-            // console.log("SKIP!!!!! %j", schemaField);
             continue;
           }
         }
@@ -113,7 +105,6 @@ module.exports = async (argv, ctx) => {
 
       field.tableId = table.id;
 
-      // console.log(field);
       await ctx.client.createField(field);
     }
   }
