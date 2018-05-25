@@ -1,74 +1,120 @@
 const fs = require('fs');
 const pick = require('lodash/pick');
-const findIndex = require('lodash/findIndex');
-const find = require('lodash/find');
+const pkg = require('../../../../package.json');
+const logger = require('../../../logger');
 
 module.exports = async (argv, ctx) => {
+  // console.log(argv);
   const schema = JSON.parse(fs.readFileSync(argv.file, 'utf8'));
-
-  const tables = [];
-
-  for (let i = 0; i < schema.tables.length; i++) {
-    const table = schema.tables[i];
-
-    tables.push(await ctx.client.createTable({
-      name: table.name,
-      displayName: table.displayName,
-    }));
+  if (pkg.version !== schema.version) {
+    logger.warn(`Schema in file '${argv.file}' have different version!`);
+    return;
   }
 
-  const createdRelations = {};
+  // console.log("%o", schema);
+  const systemTables = (await ctx.client.getTables(false)).reduce((result, table) => {
+    if (table.isSystem) {
+      result[table.name] = table.id;
+    }
+    return result;
+  }, {});
+  // console.log("systemTables %o", systemTables);
 
-  for (let i = 0; i < schema.tables.length; i++) {
-    for (let j = 0; j < schema.tables[i].fields.length; j++) {
-      const field = pick(schema.tables[i].fields[j], [
+  const importedTables = new Map();
+
+  for (const schemaTable of schema.tables) {
+    let table;
+
+    if (schemaTable.isSystem) {
+      table = {
+        id: systemTables[schemaTable.name]
+      };
+    } else {
+      table = await ctx.client.createTable({
+        name: schemaTable.name,
+        displayName: schemaTable.displayName,
+      })
+    }
+
+    importedTables.set(schemaTable.name, table);
+  }
+  // console.log("importedTables %o", importedTables);
+
+  for (const schemaTable of schema.tables) {
+    if (schemaTable.isSystem) {
+      continue;
+    }
+
+    // console.log(schemaTable);
+    const table = importedTables.get(schemaTable.name);
+    // console.log(table);
+
+    for (const schemaField of schemaTable.fields) {
+      // console.log(schemaField);
+      const field = pick(schemaField, [
         'name',
         'displayName',
-        'description',
         'fieldType',
         'isList',
         'isRequired',
         'isUnique',
         'defaultValue',
-        'relation',
-        'fieldTypeAttributes',
+        'description',
       ]);
 
-      if (field.fieldTypeAttributes) {
-        field.fieldTypeAttributes = pick(field.fieldTypeAttributes, [
+      if (schemaField.fieldTypeAttributes) {
+        field.fieldTypeAttributes = pick(schemaField.fieldTypeAttributes, [
           'format',
           'fieldSize',
+          'listOptions',
+          'precision',
+          'currency',
+          'minValue',
+          'maxValue',
+          'showTitle',
+          'showUrl',
+          'maxSize',
+          'typeRestrictions',
         ]);
       }
 
-      if (field.relation) {
-        createdRelations[field.relation.relationTableName] = true;
+      if (schemaField.relation) {
+        const refTableName = schemaField.relation.refTable.name;
+        const refTable = importedTables.get(refTableName);
 
-        const relationTableIndex = findIndex(schema.tables, { id: field.relation.refTable.id });
+        if (refTable.relations && refTable.relations[schemaTable.name]) {
+          if (refTable.relations[schemaTable.name].includes(schemaField.name)) {
+            // console.log("SKIP!!!!! %j", schemaField);
+            continue;
+          }
+        }
+
 
         field.relation = {
-          ...pick(field.relation, [
+          ...pick(schemaField.relation, [
             'refFieldIsList',
             'refFieldIsRequired',
+            'refFieldName',
+            'refFieldDisplayName',
           ]),
-          refFieldName: find(schema.tables[relationTableIndex].fields, {
-            relation: {
-              relationTableName: field.relation.relationTableName,
-            },
-          }).name,
-          refTableId: tables[relationTableIndex].id,
+          refTableId: refTable.id,
         };
+
+        table.relations = table.relations || {};
+
+        if (table.relations[refTableName]) {
+          table.relations[refTableName].push(field.relation.refFieldName);
+        } else {
+          table.relations[refTableName] = [field.relation.refFieldName];
+        }
+
+        importedTables.set(schemaTable.name, table);
       }
 
-      if (
-        !field.relation ||
-        !createdRelations[schema.tables[i].fields[j].relation.relationTableName]
-      ) {
-        await ctx.client.createField({
-          ...field,
-          tableId: tables[i].id,
-        });
-      }
+      field.tableId = table.id;
+
+      // console.log(field);
+      await ctx.client.createField(field);
     }
   }
 };

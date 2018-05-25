@@ -93,8 +93,8 @@ class Client {
     return response.userLogin;
   }
 
-  async getTables() {
-    const request = generators.getTablesRequest();
+  async getTables(onlyUsers) {
+    const request = generators.getTablesRequest(onlyUsers);
 
     const response = await this.execute(request);
 
