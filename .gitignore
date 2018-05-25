@@ -12,3 +12,5 @@ yarn-error.log
 yerna.log
 IMPORT.json
 EXPORT.json
+*.iml
+.idea
