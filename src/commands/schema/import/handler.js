@@ -1,12 +1,11 @@
 const fs = require('fs');
 const pick = require('lodash/pick');
-const pkg = require('../../../../package.json');
-const logger = require('../../../logger');
 
 module.exports = async (argv, ctx) => {
   const schema = JSON.parse(fs.readFileSync(argv.file, 'utf8'));
-  if (pkg.version !== schema.version) {
-    logger.warn(`Schema in file '${argv.file}' have different version!`);
+
+  if (ctx.pkg.version !== schema.version) {
+    ctx.logger.warn(`Schema in file '${argv.file}' have a different version!`);
     return;
   }
 
@@ -77,10 +76,10 @@ module.exports = async (argv, ctx) => {
 
         if (refTable.relations && refTable.relations[schemaTable.name]) {
           if (refTable.relations[schemaTable.name].includes(schemaField.name)) {
+            ctx.logger.info(`Skip relation field '${schemaField.name}'. Relation already exists: ${JSON.stringify(refTable.relations, null, 2)}.\n`, 'yellow');
             continue;
           }
         }
-
 
         field.relation = {
           ...pick(schemaField.relation, [

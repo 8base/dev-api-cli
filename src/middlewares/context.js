@@ -1,12 +1,14 @@
 const Configstore = require('configstore');
 const Client = require('../client');
 const logger = require('../logger');
+const pkg = require('../../package.json');
 
 const STORE_NAME = '8base-cli-store';
 
 const createContextHandler = handler => async (argv) => {
   const ctx = {};
 
+  ctx.pkg = pkg;
   ctx.logger = logger;
 
   ctx.store = new Configstore(STORE_NAME);
