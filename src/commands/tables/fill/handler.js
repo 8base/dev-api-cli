@@ -1,7 +1,7 @@
 const faker = require('faker');
 
 module.exports = async (argv, ctx) => {
-  const tables = await ctx.client.getTables();
+  const tables = await ctx.client.getTables(true);
 
   for (let i = 0; i < tables.length; i++) {
     for (let j = 0; j < 10; j++) {

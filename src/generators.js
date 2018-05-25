@@ -26,10 +26,11 @@ const loginRequest = () => `mutation Login($data: UserLoginInput!) {
   }
 }`;
 
-const getTablesRequest = () => `query GetTables {
-  tableList(data: { onlyUserTables: true }) {
+const getTablesRequest = (onlyUsers) => `query GetTables {
+  tablesList(data: { onlyUserTables: ${onlyUsers ? 'true' : 'false'} }) {
     id
     name
+    isSystem
     fields {
       name
       fieldType
@@ -62,7 +63,7 @@ const createEntityRequest = tableName => `mutation ${tableName}Create($data: ${t
 }`;
 
 const exportSchemaRequest = () => `query ExportSchema {
-  tables: tablesList(data: { onlyUserTables: true}) {
+  tables: tablesList(data: { onlyUserTables: false }) {
     ...TableFragment
   }
 }
@@ -92,13 +93,13 @@ fragment TableFragment on Table {
     defaultValue
     relation {
       id
-      relationTableName
-      relationFieldName
-      refTable {
-        id
-      }
       refFieldIsList
       refFieldIsRequired
+      refFieldName
+      refFieldDisplayName
+      refTable {
+        name
+      }
     }
   }
 }

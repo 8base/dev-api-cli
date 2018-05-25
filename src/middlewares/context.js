@@ -21,7 +21,7 @@ const createContextHandler = handler => async (argv) => {
     result = await handler(argv, ctx);
   } catch (e) {
     // TODO Create normal error catching
-    ctx.logger.err(`Something went wrong :/ ${e.name}`);
+    ctx.logger.err(`Something went wrong :/ ${JSON.stringify(e, null, 2)}`);
   }
 
   return result;
