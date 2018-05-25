@@ -1,6 +1,6 @@
 {
   "name": "@8base/api-cli",
-  "version": "0.0.2",
+  "version": "0.0.3",
   "bin": {
     "8base-api-cli": "./src/index.js"
   },
