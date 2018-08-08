@@ -63,7 +63,7 @@ const createEntityRequest = tableName => `mutation ${tableName}Create($data: ${t
 }`;
 
 const exportSchemaRequest = () => `query ExportSchema {
-  tables: tablesList(data: { onlyUserTables: false }) {
+  tables: tablesList(filter: { onlyUserTables: false }) {
     ...TableFragment
   }
 }
