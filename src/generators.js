@@ -27,7 +27,7 @@ const loginRequest = () => `mutation Login($data: UserLoginInput!) {
 }`;
 
 const getTablesRequest = onlyUsers => `query GetTables {
-  tablesList(data: { onlyUserTables: ${onlyUsers ? 'true' : 'false'} }) {
+  tablesList(filter: { onlyUserTables: ${onlyUsers ? 'true' : 'false'} }) {
     id
     name
     isSystem
