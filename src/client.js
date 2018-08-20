@@ -74,7 +74,7 @@ class Client {
 
     const response = await this.execute(request, { data });
 
-    return response.userSignUp;
+    return response.system.userSignUp;
   }
 
   async confirm(data) {
@@ -82,7 +82,7 @@ class Client {
 
     const response = await this.execute(request, { data });
 
-    return response.userSignUpConfirm;
+    return response.system.userSignUpConfirm;
   }
 
   async login(data) {
@@ -90,7 +90,7 @@ class Client {
 
     const response = await this.execute(request, { data });
 
-    return response.userLogin;
+    return response.system.userLogin;
   }
 
   async getTables(onlyUsers) {
@@ -98,7 +98,7 @@ class Client {
 
     const response = await this.execute(request);
 
-    return response.tablesList;
+    return response.system.tablesList;
   }
 
   async createTable(data) {
@@ -106,7 +106,7 @@ class Client {
 
     const response = await this.execute(request, { data });
 
-    return response.tableCreate;
+    return response.system.tableCreate;
   }
 
   async deleteTable(id) {
@@ -114,7 +114,7 @@ class Client {
 
     const response = await this.execute(request);
 
-    return response.success;
+    return response.system.success;
   }
 
   async createField(data) {
@@ -126,7 +126,7 @@ class Client {
 
     const response = await this.execute(request, variables);
 
-    return response.fieldCreate;
+    return response.system.fieldCreate;
   }
 
   async createEntity(tableName, data) {

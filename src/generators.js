@@ -1,58 +1,72 @@
 const signUpRequest = () => `mutation UserSignUp($data: UserRegistrationInput!) {
-  userSignUp(data: $data) {
-    account
+  system {
+    userSignUp(data: $data) {
+      account
+    }
   }
 }`;
 
 const confirmRequest = () => `mutation UserSignUpConfirm($data: UserSignUpConfirmInput!) {
-  userSignUpConfirm(data: $data) {
-    auth {
-      idToken
-    }
-    accounts {
-      account
+  system {
+    userSignUpConfirm(data: $data) {
+      auth {
+        idToken
+      }
+      accounts {
+        account
+      }
     }
   }
 }`;
 
 const loginRequest = () => `mutation Login($data: UserLoginInput!) {
-  userLogin(data: $data) {
-    auth {
-      idToken
-    }
-    accounts {
-      account
+  system {
+    userLogin(data: $data) {
+      auth {
+        idToken
+      }
+      accounts {
+        account
+      }
     }
   }
 }`;
 
 const getTablesRequest = onlyUsers => `query GetTables {
-  tablesList(filter: { onlyUserTables: ${onlyUsers ? 'true' : 'false'} }) {
-    id
-    name
-    isSystem
-    fields {
+  system  {
+    tablesList(filter: { onlyUserTables: ${onlyUsers ? 'true' : 'false'} }) {
+      id
       name
-      fieldType
+      isSystem
+      fields {
+        name
+        fieldType
+      }
     }
   }
 }`;
 
 const createTableRequest = () => `mutation CreateTable($data: TableCreateInput) {
-  tableCreate(data: $data) {
-    id
+  system {
+    tableCreate(data: $data) {
+      id
+    }
   }
 }`;
 
 const deleteTableRequest = id => `mutation DeleteTable {
-  tableDelete(id: "${id}") {
-    success
+  system  {
+    tableDelete(id: "${id}") {
+      success
+    }
   }
 }`;
 
 const createFieldRequest = () => `mutation CreateField($data: TableFieldCreateInput) {
-  fieldCreate(data: $data) {
-    id
+  system  {
+    fieldCreate(data: $data) {
+      id
+    }
   }
 }`;
 
@@ -63,8 +77,10 @@ const createEntityRequest = tableName => `mutation ${tableName}Create($data: ${t
 }`;
 
 const exportSchemaRequest = () => `query ExportSchema {
-  tables: tablesList(filter: { onlyUserTables: false }) {
-    ...TableFragment
+  system  {
+    tables: tablesList(filter: { onlyUserTables: false }) {
+      ...TableFragment
+    }
   }
 }
 
