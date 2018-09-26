@@ -1,6 +1,6 @@
 const signUpRequest = () => `mutation UserSignUp($data: UserRegistrationInput!) {
   userSignUp(data: $data) {
-    account
+    workspace
   }
 }`;
 
@@ -9,8 +9,8 @@ const confirmRequest = () => `mutation UserSignUpConfirm($data: UserSignUpConfir
     auth {
       idToken
     }
-    accounts {
-      account
+    workspaces {
+      workspace
     }
   }
 }`;
@@ -20,8 +20,8 @@ const loginRequest = () => `mutation Login($data: UserLoginInput!) {
     auth {
       idToken
     }
-    accounts {
-      account
+    workspaces {
+      workspace
     }
   }
 }`;
@@ -63,7 +63,7 @@ const createEntityRequest = tableName => `mutation ${tableName}Create($data: ${t
 }`;
 
 const exportSchemaRequest = () => `query ExportSchema {
-  tables: tablesList(filter: { onlyUserTables: false }) {
+  tables: tablesList(filter: { onlyUserTables: true }) {
     ...TableFragment
   }
 }

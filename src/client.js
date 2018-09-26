@@ -11,37 +11,30 @@ class Client {
     this.authorization = authorization;
   }
 
-  setAccountId(accountId) {
-    this.accountId = accountId;
-  }
-
-  setOrganizationId(organizationId) {
-    this.organizationId = organizationId;
+  setWorkspaceId(workspace) {
+    this.workspace = workspace;
   }
 
   constructor({
     url,
     authorization = '',
-    accountId = '',
-    organizationId = '',
+    workspace = '',
   } = {}) {
     this.setUrl(url);
     this.setAuthorization(authorization);
-    this.setAccountId(accountId);
-    this.setOrganizationId(organizationId);
+    this.setWorkspaceId(workspace);
     this.updateEnvironment();
   }
 
   updateEnvironment() {
     const {
-      url, authorization, accountId, organizationId,
+      url, authorization, workspace,
     } = this;
 
     const headers = {};
 
     headers.Authorization = authorization;
-    headers['account-id'] = accountId;
-    headers['organization-id'] = organizationId;
+    headers.workspace = workspace;
 
     this.gqlc = new GraphQLClient(url, { headers });
   }

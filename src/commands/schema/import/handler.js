@@ -11,7 +11,7 @@ module.exports = async (argv, ctx) => {
 
   const systemTables = (await ctx.client.getTables(false)).reduce((result, table) => {
     if (table.isSystem) {
-      result[table.name] = table.id; // eslint-disable-line no-param-reassign
+      result[table.name] = table; // eslint-disable-line no-param-reassign
     }
     return result;
   }, {});
@@ -23,7 +23,7 @@ module.exports = async (argv, ctx) => {
 
     if (schemaTable.isSystem) {
       table = {
-        id: systemTables[schemaTable.name],
+        id: systemTables[schemaTable.name].id,
       };
     } else {
       table = await ctx.client.createTable({
@@ -72,7 +72,8 @@ module.exports = async (argv, ctx) => {
 
       if (schemaField.relation) {
         const refTableName = schemaField.relation.refTable.name;
-        const refTable = importedTables.get(refTableName);
+
+        const refTable = importedTables.get(refTableName) || systemTables[refTableName];
 
         if (refTable.relations && refTable.relations[schemaTable.name]) {
           if (refTable.relations[schemaTable.name].includes(schemaField.name)) {

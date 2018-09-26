@@ -17,7 +17,7 @@ module.exports = yargs => yargs
     default: 'Ivanov',
     type: 'string',
   })
-  .option('organization', {
+  .option('workspace', {
     demandOption: false,
     default: '8base',
     type: 'string',

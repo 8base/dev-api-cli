@@ -1,7 +1,6 @@
 const createAuthenticatedHandler = handler => (argv, ctx) => {
   ctx.client.setAuthorization(ctx.store.get('auth.token'));
-  ctx.client.setAccountId(ctx.store.get('auth.accountId'));
-  ctx.client.setOrganizationId(ctx.store.get('auth.organizationId'));
+  ctx.client.setWorkspaceId(ctx.store.get('auth.workspaceId'));
   ctx.client.updateEnvironment();
 
   return handler(argv, ctx);
