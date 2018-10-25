@@ -5,13 +5,38 @@ module.exports = async (argv, ctx) => {
 
   email = email.replace(/@/, `+${Math.round(Math.random() * (10 ** 10))}@`);
 
-  await ctx.client.signUp({
-    firstName: argv.firstName,
-    lastName: argv.lastName,
-    workspace: argv.workspace,
+  const signUpData = {
+    client_id: 'lJDVb8s0468eDLucm9bxHGhoTm2DJPfA',
     email,
     password: argv.password,
+    connection: 'Username-Password-Authentication',
+    user_metadata: {
+      given_name: argv.firstName,
+      family_name: argv.lastName,
+    },
+  };
+
+  ctx.logger.info(JSON.stringify(signUpData, null, 2));
+
+  await fetch('https://8base-dev.auth0.com/dbconnections/signup', {
+    method: 'POST',
+    headers: {
+      Accept: 'application/json',
+      'Content-Type': 'application/json',
+    },
+    body: JSON.stringify({
+      client_id: 'lJDVb8s0468eDLucm9bxHGhoTm2DJPfA',
+      email,
+      password: argv.password,
+      connection: 'Username-Password-Authentication',
+      user_metadata: {
+        given_name: argv.firstName,
+        family_name: argv.lastName,
+      },
+    }),
   });
+
+  ctx.logger.info('Sign up is successful');
 
   const inbox = new TestInbox({
     host: argv.host,
@@ -23,19 +48,13 @@ module.exports = async (argv, ctx) => {
 
   const message = await inbox.findOne({ to: email, subject: 'Welcome to 8base' }, { timeout: 180000 });
 
-  const code = message.html.match(/code=([\d]+)/)[1];
+  const confirmUrl = message.html.match(/\shref="([^"]+)"[^<]+Confirm Email Address</)[1];
+
+  ctx.logger.info(`Confirm url: ${confirmUrl}`);
 
   await inbox.close();
 
-  const response = await ctx.client.confirm({
-    email,
-    password: argv.password,
-    code,
-  });
+  const res = await fetch(confirmUrl);
 
-  if (argv.save) {
-    ctx.store.set('auth.email', email);
-    ctx.store.set('auth.workspaceId', response.workspaces[0].workspace);
-    ctx.store.set('auth.token', response.auth.idToken);
-  }
+  ctx.logger.info('Confirmation is successful');
 };
